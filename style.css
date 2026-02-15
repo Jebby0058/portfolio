@@ -1,0 +1,128 @@
+body {
+    background-color: #1a1a1a;
+    color: #e0e0e0; /*เปลี่ยนสีฟอนต์*/
+    font-family: sans-serif;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;/* ลบเหลี่ยมมุมให้โค้งมน */
+}
+
+.gallery {
+    display: flex;          /* เปิดโหมดจัดระเบียบ */
+    flex-wrap: wrap;        /* สำคัญ! ถ้าที่เต็ม ให้ปัดตกไปบรรทัดใหม่ (ถ้าไม่ใส่ รูปจะเบียดกันตาย) */
+    justify-content: center;/* จัดให้ก้อนรูปรวมๆ กันอยู่ตรงกลาง */
+    gap: 20px;
+}
+
+.gallery figure {
+    width: 30%;             /* ให้แต่ละรูปกว้าง 30% (3 รูป = 90% เหลือที่ว่างนิดหน่อยสวยๆ) */
+    margin: 0;              /* ลบระยะห่างเดิมทิ้ง จะได้จัดด้วย gap ง่ายๆ */
+    background-color: #333; /* แถม: ใส่สีพื้นหลังให้กรอบรูปหน่อย */
+    padding: 10px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.gallery figure:hover {
+    background-color: rgb(48, 48, 48);
+    transform: scale(1.25,1.25);
+
+}
+
+header, main, footer {
+    text-align: center;
+    max-width: 800px; /*บีบความกว้างให้อ่านง่าย*/
+    margin: 0 auto; /*จัดกึ่งกลาง*/
+    padding: 20px; /*กันข้อความชิดขอบเวลาดูในมือถือ*/
+}
+
+nav ul{
+    list-style: none; /*ลบจุดไข่ปลา*/
+    padding: 0; /* ลบช่องว่างส่วนเกินที่ Browser แถมมา */
+    display: flex; /* สั่งลูกๆ เข้าแถวแนวนอน */
+    justify-content: center;/* จัดแถวให้อยู่กึ่งกลาง */
+    gap: 20px; /* เว้นระยะห่างระหว่างเมนู 20px */
+}
+
+.content-section ul {
+    text-align: left;
+    list-style-position: inside;
+}
+
+nav a {
+    text-decoration: none; /* ลบขีดเส้นใต้ */
+    color: #00bcd4;        /* เปลี่ยนสีลิ้งค์เป็นสีฟ้าสดใส (Cyan) */
+    font-weight: bold;     /* ตัวหนาหน่อย */
+    font-size: 1.1rem;     /* ขยายขนาดนิดนึง */
+    transition: 0.3s;      /* เตรียมไว้สำหรับ Animation (บทหน้า) */
+
+}
+
+nav a:hover{
+    color: brown;
+}
+
+
+/*
+ปัญหาคือ: margin: 0 auto จะทำงานได้ก็ต่อเมื่อสิ่งนั้นเป็น "กล่อง" (Block) แต่ <input> โดยธรรมชาติมันเป็น "ตัวหนังสือ" (Inline) มันเลยไม่ยอมไปอยู่ตรงกลาง และมันวางเรียงต่อกันยาวๆ
+
+วิธีแก้แบบ Pro: เราจะไม่สั่งทีละตัว แต่เราจะสั่ง "แม่" ของมัน (คือ Tag <form>) ให้จับลูกๆ "เข้าแถวตอนลึก" แทน
+*/
+form {
+    display: flex;              /* เปิดใช้ Flexbox */
+    flex-direction: column;     /* สั่งให้เรียงลงมาเป็นแนวตั้ง (สำคัญมาก!) */
+    gap: 10px;                  /* เว้นระยะห่างระหว่างบรรทัด */
+    max-width: 400px;           /* บีบให้ฟอร์มกว้างแค่ 400px พอ (กำลังสวย) */
+    margin: 0 auto;             /* จัดตัวฟอร์มให้อยู่กึ่งกลางหน้าจอ */
+    text-align: left;           /* สั่งให้ Label ชิดซ้าย (อ่านง่ายกว่า) */
+}
+
+input, textarea {
+    background-color: gray;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+button {
+    transition: 0.3s;
+    background-color: white;
+    margin: 0 auto;
+    width: 80%;
+    height: 50px;
+    color: black;
+    border: none;
+    cursor: pointer; /*คำสั่งนี้จะทำให้เมาส์เปลี่ยนเป็นรูป "นิ้วชี้" เวลากดปุ่ม user จะได้รู้ว่ากดได้*/
+}
+
+button:hover {
+    background-color: rgb(48, 48, 48);
+    transform: scale(1.05,1.05);
+}
+
+.back-to-top {
+    position: fixed;      /* ทีเด็ด! สั่งให้ลอยติดหน้าจอ */
+    bottom: 30px;         /* พิกัดแนวตั้ง */
+    right: 30px;          /* พิกัดแนวนอน */
+    
+    /* ตกแต่งความสวยงาม */
+    background-color: #ff4081; /* สีชมพูเด่นๆ */
+    color: white;
+    padding: 10px 15px;
+    border-radius: 50%;   /* ทำเป็นปุ่มวงกลม */
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3); /* ใส่เงาให้ดูมีมิติว่าลอยอยู่ */
+    transition: 0.3s;
+}
+
+.back-to-top:hover {
+    transform: translateY(-5px); /* พอกดแล้วเด้งขึ้นนิดนึง */
+    background-color: #ff79b0;
+}
+
+html {
+    scroll-behavior: smooth; /* สั่งให้การวาร์ปทุกอย่างในเว็บ ค่อยๆ เลื่อนไป */
+}

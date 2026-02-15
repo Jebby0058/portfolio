@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head class="top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio</title>
+
+    <!--Link กับ CSS-->
+    <link rel="stylesheet" href="style.css">
+
+
+    <!--<h1>Welcome to My Portfolio</h1>-->
+    <!--
+    ในด้านบท ไม่แนะนำเพราะ head = สมอง จะคอยเก็บค่าต่างๆ setting tag ส่วนนี้คนดูจะไม่เห็น
+    <h1> อาจจะโผล่แบบผิดที่ผิดทาง หรือ Browser อาจจะงง
+    -->
+</head>
+
+<body>
+    <header><!--ในที่นี้เราจะเริ่มการ Container หรือก็คือจัดระเบียบโดยการใช้ tag Header, Main, Footer-->
+        <h1>Welcome to My Portfolio</h1>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#portfolio">Portfolio</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+
+    <main>
+
+
+
+
+        <!--นี้คือ selector โดยจะใช้ ID #คือตัวรับ ไม่มีคือตัวส่ง-->
+        <section class="content-section" id="home">
+            <h2>This is my Portfolio</h2>
+            <img src="img/Profile.jpg" alt="Jebby" width="200">
+            <p>Lonely male with panda eyes</p>
+        </section>
+
+        <section class="content-section" id="about">
+            <h2>About Me</h2>
+            <p>Hi, My name is Jeffy, So this is my second portfolio, I do this for my education purpose.</p>
+            <h3>So this is my Hobbies</h3>
+            <!--นี้คือ unorder list ใช้เพื่อจัดเรียงรายการแบบไม่มีตัวเลข-->
+            <ul>
+                <li>
+                    Drawing
+                    <p>You can check what I draw by click <a href="#portfolio">here</a></p>
+
+                </li>
+
+                <li>
+                    Reading maybe Novel, Manga
+                    <p>oh! oh!, And the most novel I like is <strong> Moutain of Madness </strong>H.P love craft!!</p>
+                </li>
+
+
+                <li>
+                    Play Game
+                    <p>Tarkov...and <em>BLUE ARCHIVE!</em> I really love they art and world setting!</p>
+                </li>
+
+
+                <li>
+                    Listen Music
+                    <p>Heavy metal, J-POP, Rock, Country</p>
+                </li>
+            </ul>
+
+        </section>
+
+        <section class="content-section" id="portfolio">
+            <h2>Portfolio</h2>
+            <h3>So this is all of my work maybe is art, video or smth</h3>
+            <div class="gallery">
+                <figure>
+                    <img src="img/kannaWIP.png" alt="kanna">
+                    <figcaption>This is kanna from blue archive but is wip</figcaption>
+                </figure>
+
+                <figure>
+                    <img src="img/Event.png" alt="event">
+                    <figcaption>This is for my event in college</figcaption>
+                </figure>
+
+                <figure>
+                    <img src="img/2.png" alt="skull">
+                    <figcaption>This is for Shirt logo</figcaption>
+                </figure>
+
+                <figure>
+                    <img src="img/1.png" alt="skull">
+                    <figcaption>This is for Shirt logo too</figcaption>
+                </figure>
+            </div>
+
+        </section>
+
+        <section class="content-section" id="contact">
+            <h2>Contact Me</h2>
+            <form action="">
+                <!--การใส ID ผูกกับ input พอคลิกไปที่หัวข้อมันจะเด้งไปที่ช่องข้อความทันที-->
+                <label for="name_input">Your Name:</label>
+                <input type="text" id="name_input">
+
+                <label for="email_input">Email:</label>
+                <input type="email" id="email_input">
+
+                <label for="message">What you want to tell me?:</label>
+                <textarea name="textarea" id="message"></textarea>
+
+                <button>Send Message!</button>
+
+
+
+
+
+            </form>
+
+
+        </section>
+
+
+    </main>
+
+
+
+
+    <footer>@ copyright Jebby</footer>
+    <a href="#top" class="back-to-top">⬆</a>
+</body>
+
+</html>
