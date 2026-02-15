@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-portfolio-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app:  my-portfolio
+  template:
+    metadata:
+      labels:
+        app:  my-portfolio
+    spec:
+      containers:
+      - name: portfolio-container
+        image: sweetliberty/portfolio1:v1  # ใช้ Image ที่คุณสร้างเอง
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
