@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Tracker</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* สไตล์เพิ่มเติมเฉพาะหน้านี้ เพื่อจัดระเบียบ Task Board */
+        .tracker-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .board { display: flex; gap: 20px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .column { background-color: #333; padding: 15px; border-radius: 10px; flex: 1; min-width: 250px; text-align: left; }
+        .task-card { background-color: #555; padding: 15px; margin-bottom: 10px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .log-form { background-color: #2a2a2a; padding: 20px; border-radius: 10px; }
+        .log-form input, .log-form select, .log-form textarea { width: 100%; box-sizing: border-box; margin-top: 5px; margin-bottom: 15px; }
+        .delete-btn { background-color: #ff4081; padding: 5px 10px; font-size: 0.8rem; margin-top: 10px; width: auto; height: auto; }
+        .delete-btn:hover { background-color: #ff1c68; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>My Internship Tracker</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">⬅ Back to Portfolio</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="tracker-container">
+        
+        <section class="content-section">
+            <h2>Add New Task / Log</h2>
+            <form class="log-form" id="taskForm">
+                <label for="taskDate">Date:</label>
+                <input type="date" id="taskDate" required>
+                
+                <label for="taskDesc">What did you do?:</label>
+                <textarea id="taskDesc" rows="3" required placeholder="e.g., Learned about Docker and created UI..."></textarea>
+                
+                <label for="taskStatus">Status:</label>
+                <select id="taskStatus" style="padding: 10px; border-radius: 5px; background-color: gray; color: white;">
+                    <option value="todo">To Do 📝</option>
+                    <option value="progress">In Progress ⏳</option>
+                    <option value="done">Done ✅</option>
+                </select>
+                
+                <button type="submit">Save Log</button>
+            </form>
+        </section>
+
+        <hr style="border-color: #555; margin: 40px 0;">
+
+        <section class="content-section">
+            <h2>Task Board</h2>
+            <div class="board">
+                <div class="column" id="col-todo">
+                    <h3 style="color: #ffb74d;">To Do 📝</h3>
+                    </div>
+                <div class="column" id="col-progress">
+                    <h3 style="color: #64b5f6;">In Progress ⏳</h3>
+                    </div>
+                <div class="column" id="col-done">
+                    <h3 style="color: #81c784;">Done ✅</h3>
+                    </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>@ copyright Jebby</footer>
+
+    <script>
+        // 1. ดึงข้อมูลเดิมจากเบราว์เซอร์ ถ้าไม่มีให้เป็นค่าว่าง
+        let tasks = JSON.parse(localStorage.getItem('internTasks')) || [];
+
+        // 2. ฟังก์ชันอัปเดตกระดาน
+        function renderTasks() {
+            // ล้างข้อมูลเก่าบนหน้าจอก่อน
+            document.getElementById('col-todo').innerHTML = '<h3 style="color: #ffb74d;">To Do 📝</h3>';
+            document.getElementById('col-progress').innerHTML = '<h3 style="color: #64b5f6;">In Progress ⏳</h3>';
+            document.getElementById('col-done').innerHTML = '<h3 style="color: #81c784;">Done ✅</h3>';
+
+            // วนลูปสร้างกล่องข้อความตามข้อมูลที่มี
+            tasks.forEach((task, index) => {
+                const taskCard = document.createElement('div');
+                taskCard.className = 'task-card';
+                taskCard.innerHTML = `
+                    <small style="color: #aaa;">${task.date}</small>
+                    <p style="margin: 10px 0;">${task.desc}</p>
+                    <button class="delete-btn" onclick="deleteTask(${index})">Delete</button>
+                `;
+
+                // คัดแยกงานลงคอลัมน์ตาม Status
+                if (task.status === 'todo') document.getElementById('col-todo').appendChild(taskCard);
+                if (task.status === 'progress') document.getElementById('col-progress').appendChild(taskCard);
+                if (task.status === 'done') document.getElementById('col-done').appendChild(taskCard);
+            });
+        }
+
+        // 3. ฟังคำสั่งตอนกดปุ่ม Save
+        document.getElementById('taskForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // กันไม่ให้หน้าเว็บรีเฟรช
+            
+            // นำข้อมูลจากฟอร์มมาเก็บเป็น Object
+            const newTask = {
+                date: document.getElementById('taskDate').value,
+                desc: document.getElementById('taskDesc').value,
+                status: document.getElementById('taskStatus').value
+            };
+
+            // เพิ่มเข้ากล่องเก็บของและเซฟลงเบราว์เซอร์
+            tasks.push(newTask);
+            localStorage.setItem('internTasks', JSON.stringify(tasks));
+
+            // เคลียร์ค่าในฟอร์มและรีเฟรชกระดาน
+            this.reset();
+            renderTasks();
+        });
+
+        // 4. ฟังก์ชันสำหรับลบงาน
+        function deleteTask(index) {
+            tasks.splice(index, 1); 
+            localStorage.setItem('internTasks', JSON.stringify(tasks)); 
+            renderTasks(); 
+        }
+
+        // โหลดข้อมูลขึ้นมากระดานตอนเปิดเว็บครั้งแรก
+        renderTasks();
+    </script>
+</body>
+</html>
