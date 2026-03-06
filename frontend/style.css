@@ -126,3 +126,107 @@ button:hover {
 html {
     scroll-behavior: smooth; /* สั่งให้การวาร์ปทุกอย่างในเว็บ ค่อยๆ เลื่อนไป */
 }
+
+/* =========================================
+   สไตล์สำหรับหน้า InternTracker (ระบบบันทึกงาน)
+   ========================================= */
+
+.tracker-container { 
+    max-width: 900px; 
+    margin: 0 auto; 
+    padding: 20px; 
+}
+
+.board { 
+    display: flex; 
+    gap: 20px; 
+    justify-content: center; 
+    margin-top: 20px; 
+    flex-wrap: wrap; 
+}
+
+.column { 
+    background-color: #333; 
+    padding: 15px; 
+    border-radius: 10px; 
+    flex: 1; 
+    min-width: 250px; 
+    text-align: left; 
+}
+
+.task-card { 
+    background-color: #555; 
+    padding: 15px; 
+    margin-bottom: 10px; 
+    border-radius: 5px; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); 
+}
+
+.log-form { 
+    background-color: #2a2a2a; 
+    padding: 20px; 
+    border-radius: 10px; 
+}
+
+.log-form input, 
+.log-form select, 
+.log-form textarea { 
+    width: 100%; 
+    box-sizing: border-box; 
+    margin-top: 5px; 
+    margin-bottom: 15px; 
+}
+
+.delete-btn { 
+    background-color: #ff4081; 
+    padding: 5px 10px; 
+    font-size: 0.8rem; 
+    margin-top: 10px; 
+    width: auto; 
+    height: auto; 
+}
+
+.delete-btn:hover { 
+    background-color: #ff1c68; 
+}
+
+.learn-text { 
+    background-color: #444; 
+    padding: 8px; 
+    border-left: 3px solid #ffeb3b; 
+    font-size: 0.9em; 
+    margin-top: 10px; 
+}
+
+/* จัดระเบียบปุ่ม Edit และ Delete ให้อยู่คู่กัน */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* สไตล์สำหรับปุ่ม Edit */
+.edit-btn {
+    background-color: #4CAF50; /* สีเขียว */
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: 0.3s;
+}
+
+.edit-btn:hover {
+    background-color: #45a049;
+}
+
+/* ปรับปุ่ม Delete เดิมนิดหน่อยให้เข้าคู่กัน */
+.delete-btn {
+    margin-top: 0; /* ลบ margin เดิมออก เพราะเราใช้ gap ใน .action-buttons แล้ว */
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
