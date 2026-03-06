@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* สไตล์เพิ่มเติมเฉพาะหน้านี้ เพื่อจัดระเบียบ Task Board */
         .tracker-container { max-width: 900px; margin: 0 auto; padding: 20px; }
         .board { display: flex; gap: 20px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
         .column { background-color: #333; padding: 15px; border-radius: 10px; flex: 1; min-width: 250px; text-align: left; }
@@ -17,6 +16,7 @@
         .log-form input, .log-form select, .log-form textarea { width: 100%; box-sizing: border-box; margin-top: 5px; margin-bottom: 15px; }
         .delete-btn { background-color: #ff4081; padding: 5px 10px; font-size: 0.8rem; margin-top: 10px; width: auto; height: auto; }
         .delete-btn:hover { background-color: #ff1c68; }
+        .learn-text { background-color: #444; padding: 8px; border-left: 3px solid #ffeb3b; font-size: 0.9em; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -38,7 +38,10 @@
                 <input type="date" id="taskDate" required>
                 
                 <label for="taskDesc">What did you do?:</label>
-                <textarea id="taskDesc" rows="3" required placeholder="e.g., Learned about Docker and created UI..."></textarea>
+                <textarea id="taskDesc" rows="2" required placeholder="e.g., Fix bugs in the frontend..."></textarea>
+                
+                <label for="taskLearn">What did you learn today? 💡:</label>
+                <textarea id="taskLearn" rows="2" placeholder="e.g., Learned how to use Docker and GitHub basic commands..."></textarea>
                 
                 <label for="taskStatus">Status:</label>
                 <select id="taskStatus" style="padding: 10px; border-radius: 5px; background-color: gray; color: white;">
@@ -58,13 +61,13 @@
             <div class="board">
                 <div class="column" id="col-todo">
                     <h3 style="color: #ffb74d;">To Do 📝</h3>
-                    </div>
+                </div>
                 <div class="column" id="col-progress">
                     <h3 style="color: #64b5f6;">In Progress ⏳</h3>
-                    </div>
+                </div>
                 <div class="column" id="col-done">
                     <h3 style="color: #81c784;">Done ✅</h3>
-                    </div>
+                </div>
             </div>
         </section>
     </main>
@@ -72,61 +75,59 @@
     <footer>@ copyright Jebby</footer>
 
     <script>
-        // 1. ดึงข้อมูลเดิมจากเบราว์เซอร์ ถ้าไม่มีให้เป็นค่าว่าง
         let tasks = JSON.parse(localStorage.getItem('internTasks')) || [];
 
-        // 2. ฟังก์ชันอัปเดตกระดาน
         function renderTasks() {
-            // ล้างข้อมูลเก่าบนหน้าจอก่อน
             document.getElementById('col-todo').innerHTML = '<h3 style="color: #ffb74d;">To Do 📝</h3>';
             document.getElementById('col-progress').innerHTML = '<h3 style="color: #64b5f6;">In Progress ⏳</h3>';
             document.getElementById('col-done').innerHTML = '<h3 style="color: #81c784;">Done ✅</h3>';
 
-            // วนลูปสร้างกล่องข้อความตามข้อมูลที่มี
             tasks.forEach((task, index) => {
                 const taskCard = document.createElement('div');
                 taskCard.className = 'task-card';
+                
+                // ตรวจสอบว่ามีการกรอกสิ่งที่ได้เรียนรู้ไหม ถ้ามีให้แสดงกล่องสีเหลือง
+                let learnHTML = '';
+                if(task.learn && task.learn.trim() !== '') {
+                    learnHTML = `<div class="learn-text">💡 <strong>Learned:</strong> ${task.learn}</div>`;
+                }
+
                 taskCard.innerHTML = `
                     <small style="color: #aaa;">${task.date}</small>
-                    <p style="margin: 10px 0;">${task.desc}</p>
+                    <p style="margin: 10px 0;"><strong>Task:</strong> ${task.desc}</p>
+                    ${learnHTML}
                     <button class="delete-btn" onclick="deleteTask(${index})">Delete</button>
                 `;
 
-                // คัดแยกงานลงคอลัมน์ตาม Status
                 if (task.status === 'todo') document.getElementById('col-todo').appendChild(taskCard);
                 if (task.status === 'progress') document.getElementById('col-progress').appendChild(taskCard);
                 if (task.status === 'done') document.getElementById('col-done').appendChild(taskCard);
             });
         }
 
-        // 3. ฟังคำสั่งตอนกดปุ่ม Save
         document.getElementById('taskForm').addEventListener('submit', function(e) {
-            e.preventDefault(); // กันไม่ให้หน้าเว็บรีเฟรช
+            e.preventDefault(); 
             
-            // นำข้อมูลจากฟอร์มมาเก็บเป็น Object
             const newTask = {
                 date: document.getElementById('taskDate').value,
                 desc: document.getElementById('taskDesc').value,
+                learn: document.getElementById('taskLearn').value, // 💡 เก็บค่าที่ได้เรียนรู้
                 status: document.getElementById('taskStatus').value
             };
 
-            // เพิ่มเข้ากล่องเก็บของและเซฟลงเบราว์เซอร์
             tasks.push(newTask);
             localStorage.setItem('internTasks', JSON.stringify(tasks));
 
-            // เคลียร์ค่าในฟอร์มและรีเฟรชกระดาน
             this.reset();
             renderTasks();
         });
 
-        // 4. ฟังก์ชันสำหรับลบงาน
         function deleteTask(index) {
             tasks.splice(index, 1); 
             localStorage.setItem('internTasks', JSON.stringify(tasks)); 
             renderTasks(); 
         }
 
-        // โหลดข้อมูลขึ้นมากระดานตอนเปิดเว็บครั้งแรก
         renderTasks();
     </script>
 </body>
