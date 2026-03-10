@@ -6,13 +6,40 @@
     <title>Internship Tracker</title>
     
     <link rel="stylesheet" href="style.css">
+    
+    <style>
+        .tracker-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .board { display: flex; gap: 20px; justify-content: center; margin-top: 20px; flex-wrap: wrap; align-items: flex-start; }
+        .column { background-color: #333; padding: 15px; border-radius: 10px; flex: 1; min-width: 280px; text-align: left; }
+        .task-card { background-color: #555; padding: 15px; margin-bottom: 15px; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative; }
+        .log-form { background-color: #2a2a2a; padding: 20px; border-radius: 10px; }
+        .log-form input, .log-form select, .log-form textarea { width: 100%; box-sizing: border-box; margin-top: 5px; margin-bottom: 15px; }
+        
+        .action-buttons { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; }
+        .edit-btn { background-color: #4CAF50; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; font-size: 0.8rem; }
+        .delete-btn { background-color: #ff4081; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; font-size: 0.8rem; }
+        
+        .learn-text { background-color: #444; padding: 8px; border-left: 3px solid #ffeb3b; font-size: 0.9em; margin-top: 10px; }
+        .feedback-text { background-color: #5c2018; color: #ffbba6; padding: 8px; border-left: 3px solid #ff5722; font-size: 0.9em; margin-top: 10px; }
+        
+        /* สไตล์ Gallery รูปอ้างอิง */
+        .task-gallery { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
+        .task-gallery img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; cursor: zoom-in; transition: 0.2s; border: 1px solid #777; }
+        .task-gallery img:hover { transform: scale(1.1); }
+
+        /* สไตล์ไฟล์แนบ */
+        .task-files { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .file-link { display: inline-block; background-color: #2b5797; color: white; padding: 5px 10px; border-radius: 3px; font-size: 0.85em; text-decoration: none; word-break: break-all; }
+        .file-link:hover { background-color: #1e3f70; color: white; }
+    </style>
 </head>
 <body>
     <header>
-        <h1>My Internship Tracker</h1>
+        <h1>Internship Task Board 📋</h1>
         <nav>
             <ul>
                 <li><a href="index.html">⬅ Back to Portfolio</a></li>
+                <li><a href="journal.html">My Journal</a></li>
             </ul>
         </nav>
     </header>
@@ -20,16 +47,22 @@
     <main class="tracker-container">
         
         <section class="content-section">
-            <h2 id="formTitle">Add New Task / Log</h2>
+            <h2 id="formTitle">Assign / Edit Task</h2>
             <form class="log-form" id="taskForm">
-                <label for="taskDate">Date:</label>
+                <label for="taskDate">Due Date / Date:</label>
                 <input type="date" id="taskDate" required>
                 
-                <label for="taskDesc">What did you do?:</label>
-                <textarea id="taskDesc" rows="2" required placeholder="e.g., Fix bugs in the frontend..."></textarea>
+                <label for="taskDesc">Task Description (สั่งงานอะไร):</label>
+                <textarea id="taskDesc" rows="3" required placeholder="e.g., Design a new logo for the project..."></textarea>
                 
-                <label for="taskLearn">What did you learn today? 💡:</label>
-                <textarea id="taskLearn" rows="2" placeholder="e.g., Learned how to use Docker and GitHub basic commands..."></textarea>
+                <label for="taskFeedback">Revision / Feedback 🔴 (ใส่คอมเมนต์แก้งาน):</label>
+                <textarea id="taskFeedback" rows="2" placeholder="e.g., Please change the background color to blue..."></textarea>
+                
+                <label for="taskImages">Reference Images 🖼️ (แนบรูปตัวอย่าง):</label>
+                <input type="file" id="taskImages" accept="image/*" multiple style="background-color: transparent; padding: 0;">
+
+                <label for="taskFiles">Attachments 📁 (แนบไฟล์งานให้โหลด):</label>
+                <input type="file" id="taskFiles" multiple style="background-color: transparent; padding: 0;">
                 
                 <label for="taskStatus">Status:</label>
                 <select id="taskStatus" style="padding: 10px; border-radius: 5px; background-color: gray; color: white;">
@@ -38,7 +71,7 @@
                     <option value="done">Done ✅</option>
                 </select>
                 
-                <button type="submit" id="submitBtn">Save Log</button>
+                <button type="submit" id="submitBtn">Save Task</button>
                 <button type="button" id="cancelBtn" style="display: none; background-color: #777; margin-top: 10px;" onclick="cancelEdit()">Cancel Edit</button>
             </form>
         </section>
@@ -46,27 +79,24 @@
         <hr style="border-color: #555; margin: 40px 0;">
 
         <section class="content-section">
-            <h2>Task Board</h2>
+            <h2>Team Task Board</h2>
             <div class="board">
-                <div class="column" id="col-todo">
-                    <h3 style="color: #ffb74d;">To Do 📝</h3>
-                </div>
-                <div class="column" id="col-progress">
-                    <h3 style="color: #64b5f6;">In Progress ⏳</h3>
-                </div>
-                <div class="column" id="col-done">
-                    <h3 style="color: #81c784;">Done ✅</h3>
-                </div>
+                <div class="column" id="col-todo"><h3 style="color: #ffb74d;">To Do 📝</h3></div>
+                <div class="column" id="col-progress"><h3 style="color: #64b5f6;">In Progress ⏳</h3></div>
+                <div class="column" id="col-done"><h3 style="color: #81c784;">Done ✅</h3></div>
             </div>
         </section>
     </main>
+
+    <div id="imageModal" class="modal">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="fullImage">
+    </div>
 
     <footer>@ copyright Jebby</footer>
 
     <script>
         let tasks = JSON.parse(localStorage.getItem('internTasks')) || [];
-        
-        // ตัวแปรสำหรับจำว่าเรากำลัง "แก้ไข" ข้อมูลช่องไหนอยู่ (-1 แปลว่าไม่ได้แก้ กำลังเพิ่มใหม่)
         let editIndex = -1; 
 
         function renderTasks() {
@@ -78,20 +108,42 @@
                 const taskCard = document.createElement('div');
                 taskCard.className = 'task-card';
                 
-                let learnHTML = '';
-                if(task.learn && task.learn.trim() !== '') {
-                    learnHTML = `<div class="learn-text">💡 <strong>Learned:</strong> ${task.learn}</div>`;
+                // 1. จัดการ Feedback
+                let feedbackHTML = '';
+                if(task.feedback && task.feedback.trim() !== '') {
+                    feedbackHTML = `<div class="feedback-text">🔴 <strong>Revision:</strong> ${task.feedback}</div>`;
                 }
 
-                // เพิ่มปุ่ม Edit สีเขียวข้างๆ ปุ่ม Delete
+                // 2. จัดการรูปภาพ
+                let galleryHTML = '';
+                if (task.images && task.images.length > 0) {
+                    galleryHTML = '<div class="task-gallery">';
+                    task.images.forEach(img => {
+                        galleryHTML += `<img src="${img}" alt="ref" onclick="openModal('${img}')">`;
+                    });
+                    galleryHTML += '</div>';
+                }
+
+                // 3. จัดการไฟล์แนบ (ให้กดโหลดได้)
+                let filesHTML = '';
+                if (task.filesData && task.filesData.length > 0) {
+                    filesHTML = '<div class="task-files"><strong>📁 Attachments:</strong>';
+                    task.filesData.forEach(f => {
+                        filesHTML += `<a href="${f.data}" download="${f.name}" class="file-link">⬇️ ${f.name}</a>`;
+                    });
+                    filesHTML += '</div>';
+                }
+
                 taskCard.innerHTML = `
-                    <small style="color: #aaa;">${task.date}</small>
-                    <p style="margin: 10px 0;"><strong>Task:</strong> ${task.desc}</p>
-                    ${learnHTML}
                     <div class="action-buttons">
                         <button class="edit-btn" onclick="editTask(${index})">Edit</button>
-                        <button class="delete-btn" onclick="deleteTask(${index})">Delete</button>
+                        <button class="delete-btn" onclick="deleteTask(${index})">Del</button>
                     </div>
+                    <small style="color: #aaa;">📅 ${task.date}</small>
+                    <p style="margin: 10px 0;"><strong>Task:</strong> ${task.desc}</p>
+                    ${feedbackHTML}
+                    ${galleryHTML}
+                    ${filesHTML}
                 `;
 
                 if (task.status === 'todo') document.getElementById('col-todo').appendChild(taskCard);
@@ -100,77 +152,98 @@
             });
         }
 
-        // ฟังก์ชันเมื่อกดปุ่ม Edit
         function editTask(index) {
             const task = tasks[index];
-            
-            // ดึงข้อมูลจากกระดาน ไปใส่คืนในฟอร์ม
             document.getElementById('taskDate').value = task.date;
             document.getElementById('taskDesc').value = task.desc;
-            document.getElementById('taskLearn').value = task.learn || '';
+            document.getElementById('taskFeedback').value = task.feedback || '';
             document.getElementById('taskStatus').value = task.status;
-
-            // จำไว้ว่ากำลังแก้ไข index ไหน
             editIndex = index;
 
-            // เปลี่ยนหน้าตาฟอร์มนิดหน่อยให้รู้ว่ากำลังแก้ไข
             document.getElementById('formTitle').innerText = "Edit Task";
-            document.getElementById('submitBtn').innerText = "Update Log";
-            document.getElementById('submitBtn').style.backgroundColor = "#4CAF50"; // เปลี่ยนปุ่มเป็นสีเขียว
-            document.getElementById('cancelBtn').style.display = "block"; // โชว์ปุ่ม Cancel
-
-            // เลื่อนหน้าจอกลับไปข้างบนสุดเผื่อผู้ใช้อยู่ด้านล่าง
+            document.getElementById('submitBtn').innerText = "Update Task";
+            document.getElementById('submitBtn').style.backgroundColor = "#ff9800"; 
+            document.getElementById('cancelBtn').style.display = "block"; 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ฟังก์ชันยกเลิกการแก้ไข
         function cancelEdit() {
-            document.getElementById('taskForm').reset(); // ล้างฟอร์ม
-            editIndex = -1; // รีเซ็ตสถานะกลับเป็นโหมดเพิ่มข้อมูลใหม่
-            
-            // คืนค่าหน้าตาฟอร์มกลับเป็นเหมือนเดิม
-            document.getElementById('formTitle').innerText = "Add New Task / Log";
-            document.getElementById('submitBtn').innerText = "Save Log";
-            document.getElementById('submitBtn').style.backgroundColor = "white"; // คืนปุ่มกลับเป็นสีขาว
-            document.getElementById('cancelBtn').style.display = "none"; // ซ่อนปุ่ม Cancel
+            document.getElementById('taskForm').reset(); 
+            editIndex = -1; 
+            document.getElementById('formTitle').innerText = "Assign / Edit Task";
+            document.getElementById('submitBtn').innerText = "Save Task";
+            document.getElementById('submitBtn').style.backgroundColor = "white"; 
+            document.getElementById('cancelBtn').style.display = "none"; 
         }
 
-        // ฟังคำสั่งตอนกดปุ่ม Save หรือ Update
-        document.getElementById('taskForm').addEventListener('submit', function(e) {
+        // ฟังก์ชันช่วยอ่านไฟล์หลายๆ ไฟล์พร้อมกัน
+        const readFilesAsBase64 = (files) => {
+            return Promise.all(Array.from(files).map(file => {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = e => resolve({ name: file.name, data: e.target.result });
+                    reader.readAsDataURL(file);
+                });
+            }));
+        };
+
+        document.getElementById('taskForm').addEventListener('submit', async function(e) {
             e.preventDefault(); 
             
-            const taskData = {
-                date: document.getElementById('taskDate').value,
-                desc: document.getElementById('taskDesc').value,
-                learn: document.getElementById('taskLearn').value,
-                status: document.getElementById('taskStatus').value
-            };
+            const date = document.getElementById('taskDate').value;
+            const desc = document.getElementById('taskDesc').value;
+            const feedback = document.getElementById('taskFeedback').value;
+            const status = document.getElementById('taskStatus').value;
+            
+            const imageInput = document.getElementById('taskImages');
+            const fileInput = document.getElementById('taskFiles');
+
+            // 🌟 อ่านรูปภาพและไฟล์ (ถ้ามีอัปโหลดเข้ามาใหม่)
+            let newImages = [];
+            if (imageInput.files.length > 0) {
+                const imgData = await readFilesAsBase64(imageInput.files);
+                newImages = imgData.map(img => img.data); // เอาแค่ string base64
+            }
+
+            let newFiles = [];
+            if (fileInput.files.length > 0) {
+                newFiles = await readFilesAsBase64(fileInput.files); // เก็บทั้งชื่อไฟล์และข้อมูล
+            }
+
+            // จัดการข้อมูลตอนแก้ไข
+            if (editIndex !== -1) {
+                if (newImages.length === 0) newImages = tasks[editIndex].images || [];
+                if (newFiles.length === 0) newFiles = tasks[editIndex].filesData || [];
+            }
+
+            const taskData = { date, desc, feedback, status, images: newImages, filesData: newFiles };
 
             if (editIndex === -1) {
-                // ถ้าเป็น -1 แปลว่าเพิ่มงานใหม่
-                tasks.push(taskData);
+                tasks.unshift(taskData);
             } else {
-                // ถ้าไม่ใช่ -1 แปลว่ากำลังแก้ไขงานเดิม ก็ให้เอาข้อมูลใหม่ไปทับตำแหน่งเดิม
                 tasks[editIndex] = taskData;
-                cancelEdit(); // บันทึกเสร็จก็รีเซ็ตฟอร์ม
+                cancelEdit(); 
             }
 
             localStorage.setItem('internTasks', JSON.stringify(tasks));
-            
-            // ถ้าเป็นการเพิ่มงานใหม่ ให้ล้างฟอร์มปกติ (ถ้าเป็นการแก้ไข cancelEdit() จะจัดการให้แล้ว)
             if (editIndex === -1) this.reset(); 
-            
             renderTasks();
         });
 
         function deleteTask(index) {
-            // ถามเพื่อความแน่ใจก่อนลบ
-            if(confirm("Are you sure you want to delete this task?")) {
+            if(confirm("Delete this task?")) {
                 tasks.splice(index, 1); 
                 localStorage.setItem('internTasks', JSON.stringify(tasks)); 
                 renderTasks(); 
             }
         }
+
+        // ระบบ Modal Pop-up รูป
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("fullImage");
+        function openModal(imgSrc) { modal.style.display = "block"; modalImg.src = imgSrc; }
+        function closeModal() { modal.style.display = "none"; }
+        window.onclick = function(event) { if (event.target === modal) closeModal(); }
 
         renderTasks();
     </script>

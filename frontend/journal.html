@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Knowledge Journal</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        .journal-container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .journal-form { background-color: #2a2a2a; padding: 20px; border-radius: 10px; text-align: left; margin-bottom: 40px; }
+        .journal-form input, .journal-form textarea { width: 100%; box-sizing: border-box; margin-top: 5px; margin-bottom: 15px; }
+        
+        .entry-card {
+            background-color: #fdf6e3; 
+            color: #333; 
+            padding: 30px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            text-align: left;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border-left: 10px solid #2e7d32; 
+            position: relative;
+        }
+        .entry-date {
+            font-size: 0.9em;
+            color: #2e7d32;
+            border-bottom: 2px solid #ccc; 
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between; 
+        }
+        .entry-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 15px; color: #111; }
+        .entry-text { line-height: 1.8; white-space: pre-wrap; font-size: 1.05rem; color: #444; }
+        
+        .entry-gallery { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; 
+            margin-top: 25px; 
+        }
+        .entry-gallery figure { margin: 0; text-align: center; }
+        .entry-gallery img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: 0.3s; cursor: zoom-in; }
+        .entry-gallery img:hover { transform: scale(1.05); }
+        
+        .gallery-caption { text-align: center; margin-top: 15px; font-size: 0.95em; color: #666; font-style: italic; background-color: #eee; padding: 5px; border-radius: 5px; }
+        
+        /* 🌟 ปรับแต่งปุ่มมุมขวาบนให้อยู่ด้วยกัน */
+        .card-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; }
+        .delete-entry-btn { background-color: #ff4081; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin: 0; }
+        .delete-entry-btn:hover { background-color: #ff1c68; }
+        .edit-entry-btn { background-color: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin: 0; }
+        .edit-entry-btn:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>My Knowledge Book 📚</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">⬅ Back to Portfolio</a></li>
+                <li><a href="tracker.html">InternTracker</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="journal-container">
+        <section class="content-section">
+            <h2 id="formTitle">Record Knowledge</h2>
+            <form class="journal-form" id="journalForm">
+                <label for="jDate">Date:</label>
+                <input type="date" id="jDate" required>
+                
+                <label for="jTitle">Topic / Subject:</label>
+                <input type="text" id="jTitle" required placeholder="e.g., How to setup Node.js Express">
+                
+                <label for="jText">Details / Summary:</label>
+                <textarea id="jText" rows="6" required placeholder="Write down what you learned today..."></textarea>
+                
+                <label for="jImage">Upload Images (Leave empty to keep current images when editing):</label>
+                <input type="file" id="jImage" accept="image/*" multiple style="background-color: transparent; padding: 0;">
+                
+                <label for="jCaption">Overall Images Caption:</label>
+                <input type="text" id="jCaption" placeholder="e.g., Screenshots of my terminal running without errors!">
+                
+                <button type="submit" id="submitBtn" style="background-color: #4CAF50; color: white;">Save to Knowledge Book</button>
+                <button type="button" id="cancelBtn" style="display: none; background-color: #777; margin-top: 10px; color: white;" onclick="cancelEdit()">Cancel Edit</button>
+            </form>
+        </section>
+
+        <section id="journalEntriesList">
+            </section>
+    </main>
+
+    <div id="imageModal" class="modal">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="fullImage">
+    </div>
+
+    <footer>@ copyright Jebby</footer>
+
+    <script>
+        let journalEntries = JSON.parse(localStorage.getItem('myKnowledgeBook')) || [];
+        
+        // 🌟 ตัวแปรเก็บสถานะว่ากำลังแก้ไขหน้าไหนอยู่ (-1 คือไม่ได้แก้)
+        let editIndex = -1;
+
+        function renderJournal() {
+            const list = document.getElementById('journalEntriesList');
+            list.innerHTML = ''; 
+
+            journalEntries.forEach((entry, index) => {
+                const card = document.createElement('div');
+                card.className = 'entry-card';
+                
+                let galleryHTML = '';
+                if (entry.images && entry.images.length > 0) {
+                    galleryHTML = '<div class="entry-gallery">';
+                    entry.images.forEach(imgData => {
+                        galleryHTML += `
+                            <figure>
+                                <img src="${imgData}" alt="Knowledge Image" onclick="openModal('${imgData}')">
+                            </figure>
+                        `;
+                    });
+                    galleryHTML += '</div>';
+                    
+                    if (entry.caption) {
+                        galleryHTML += `<div class="gallery-caption">📝 ${entry.caption}</div>`;
+                    }
+                }
+
+                // 🌟 เพิ่มปุ่ม Edit สีเขียวข้างๆ ปุ่ม Delete
+                card.innerHTML = `
+                    <div class="card-actions">
+                        <button class="edit-entry-btn" onclick="editEntry(${index})">Edit</button>
+                        <button class="delete-entry-btn" onclick="deleteEntry(${index})">Delete</button>
+                    </div>
+                    <div class="entry-date">
+                        <span>📅 ${entry.date}</span>
+                    </div>
+                    <div class="entry-title">${entry.title}</div>
+                    <div class="entry-text">${entry.text}</div>
+                    ${galleryHTML}
+                `;
+                
+                list.appendChild(card);
+            });
+        }
+
+        // 🌟 ฟังก์ชันเมื่อกดปุ่ม Edit บนหน้ากระดาษ
+        function editEntry(index) {
+            const entry = journalEntries[index];
+            
+            // ดึงข้อมูลไปใส่ในฟอร์ม
+            document.getElementById('jDate').value = entry.date;
+            document.getElementById('jTitle').value = entry.title;
+            document.getElementById('jText').value = entry.text;
+            document.getElementById('jCaption').value = entry.caption || '';
+            // หมายเหตุ: ช่องไฟล์รูปภาพ (jImage) จะต้องปล่อยว่างไว้เสมอ เป็นข้อจำกัดของ Browser
+
+            editIndex = index;
+
+            // เปลี่ยนหน้าตาฟอร์มให้ดูรู้ว่า "กำลังแก้ไขนะ"
+            document.getElementById('formTitle').innerText = "✏️ Edit Knowledge Record";
+            document.getElementById('submitBtn').innerText = "Update Record";
+            document.getElementById('submitBtn').style.backgroundColor = "#ff9800"; // เปลี่ยนปุ่มเป็นสีส้ม
+            document.getElementById('cancelBtn').style.display = "block"; // โชว์ปุ่ม Cancel
+
+            // วาร์ปกลับไปข้างบนให้ผู้ใช้พิมพ์ง่ายๆ
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 🌟 ฟังก์ชันยกเลิกการแก้ไข
+        function cancelEdit() {
+            document.getElementById('journalForm').reset();
+            editIndex = -1;
+            
+            // คืนค่าฟอร์มกลับเป็นปกติ
+            document.getElementById('formTitle').innerText = "Record Knowledge";
+            document.getElementById('submitBtn').innerText = "Save to Knowledge Book";
+            document.getElementById('submitBtn').style.backgroundColor = "#4CAF50"; 
+            document.getElementById('cancelBtn').style.display = "none"; 
+        }
+
+        document.getElementById('journalForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const date = document.getElementById('jDate').value;
+            const title = document.getElementById('jTitle').value; 
+            const text = document.getElementById('jText').value;
+            const caption = document.getElementById('jCaption').value;
+            const fileInput = document.getElementById('jImage');
+            
+            const files = fileInput.files;
+            const imagesArray = []; 
+
+            const saveToStorage = (newImagesArray) => {
+                // 🌟 ลอจิกจัดการรูปภาพตอนแก้ไข: 
+                // ถ้ากำลังแก้ไขอยู่ และไม่ได้อัปโหลดรูปใหม่ (newImagesArray ว่างเปล่า) ให้ดึงรูปเก่ามาใช้
+                if (editIndex !== -1 && newImagesArray.length === 0) {
+                    newImagesArray = journalEntries[editIndex].images || [];
+                }
+
+                const entryData = { date, title, text, caption, images: newImagesArray };
+
+                if (editIndex === -1) {
+                    journalEntries.unshift(entryData); // ถ้าเป็น -1 คือจดใหม่ ให้ดันไปบนสุด
+                } else {
+                    journalEntries[editIndex] = entryData; // ถ้าไม่ใช่ -1 คือแก้ไข ให้เอาข้อมูลใหม่ไปทับตำแหน่งเดิม
+                    cancelEdit(); // แก้ไขเสร็จก็รีเซ็ตฟอร์ม
+                }
+
+                localStorage.setItem('myKnowledgeBook', JSON.stringify(journalEntries));
+                if (editIndex === -1) document.getElementById('journalForm').reset();
+                renderJournal();
+            };
+
+            // ตรวจสอบการอ่านไฟล์รูป
+            if (files.length > 0) {
+                let filesRead = 0;
+                for (let i = 0; i < files.length; i++) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagesArray.push(e.target.result); 
+                        filesRead++;
+                        if (filesRead === files.length) {
+                            saveToStorage(imagesArray);
+                        }
+                    };
+                    reader.readAsDataURL(files[i]);
+                }
+            } else {
+                saveToStorage([]); 
+            }
+        });
+
+        function deleteEntry(index) {
+            if(confirm("Are you sure you want to delete this knowledge record?")) {
+                journalEntries.splice(index, 1);
+                localStorage.setItem('myKnowledgeBook', JSON.stringify(journalEntries));
+                renderJournal();
+            }
+        }
+
+        // =========================================
+        // ควบคุม Pop-up (Modal)
+        // =========================================
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("fullImage");
+
+        function openModal(imgSrc) {
+            modal.style.display = "block";
+            modalImg.src = imgSrc; 
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        renderJournal();
+    </script>
+</body>
+</html>
